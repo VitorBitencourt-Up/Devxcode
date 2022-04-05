@@ -1,0 +1,21 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "https://apps.correios.com.br/SigepMasterJPA/AtendeClienteService/AtendeCliente?wsdl"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, webServices"
+    ],
+    "references": [
+      "D:\\Devxcode\\DevxcodeTester\\bin\\Debug\\net5.0\\Devxcode.dll",
+      "QRCoder, {QRCoder, 1.4.1}",
+      "System.Drawing.Common, {System.Drawing.Common, 4.7.0}"
+    ],
+    "targetFramework": "net5.0",
+    "typeReuseMode": "All"
+  }
+}

@@ -22,5 +22,19 @@ namespace Devxcode
             return delegacao.Invoke(img, diretorio, filename, extensao);
         }
 
+        public static string ImageBase64(string value)
+        {
+            var delegacao = new Devxcodes.Default(Devxcodes.BitmapToBase64);
+
+            return delegacao.Invoke(value);
+        }
+
+        public static string ImageBase64(Bitmap value)
+        {
+            var delegacao = new Devxcodes.ImageBitMap(Devxcodes.BitmapToBase64);
+
+            return delegacao.Invoke(value);
+        }
+
     }
 }

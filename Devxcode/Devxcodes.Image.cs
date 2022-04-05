@@ -12,7 +12,7 @@ namespace Devxcode
         /// </summary>
         /// <param name="value">Valor a ser convertido em qrcode</param>
         /// <returns></returns>
-        public  static Bitmap Imagem(string value)
+        public static Bitmap Imagem(string value)
         {
             try
             {
@@ -33,6 +33,61 @@ namespace Devxcode
                 throw;
             }
 
+        }
+
+        /// <summary>
+        /// Gera QrCode e Converte o mesmo em Base64
+        /// </summary>
+        /// <param name="value">Texto a ser gerado o QrCode</param>
+        /// <returns></returns>
+        public static string BitmapToBase64(string value)
+        {
+
+            var stream = new MemoryStream();
+            try
+            {
+                var imageBitmap = Imagem(value);
+
+                BitmapSaveStream(imageBitmap, ref stream);
+
+                string base64 = Convert.ToBase64String(stream.ToArray());
+                return base64;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Dispose();
+            }
+        }
+        public static string BitmapToBase64(Bitmap value)
+        {
+            var stream = new MemoryStream();
+            try
+            {
+                BitmapSaveStream(value, ref stream);
+
+                string base64 = Convert.ToBase64String(stream.ToArray());
+                return base64;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Dispose();
+            }
+        }
+
+        private static void BitmapSaveStream(Bitmap value, ref MemoryStream stream) => value.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+
+        /// <summary>
+        /// Gera o QrCode com base no texto informado em <paramref name="value"/> e devolve o qrcode em Base64
+        /// </summary>
+        /// <param name="value">Valor a ser gerado o qrcode</param>
+        /// <returns>Devolve QrCode convertido em base64</returns>
+        public static string ImageToBase64(string value)
+        {
+            var image = GenerateByteArray(value);
+            string imageBase64 = Convert.ToBase64String(image);
+            return imageBase64;
         }
 
         /// <summary>

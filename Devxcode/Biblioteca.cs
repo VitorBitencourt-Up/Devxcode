@@ -2,14 +2,17 @@
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Devxcode
 {
     public static class Biblioteca
     {
+        public static Task<string> RemoveAccentsAsync(this string texto) => Task.Run(() => RemoveAccents(texto));
+
 
         #region Válidação de Número de Documentos de Pessoa Física e Pessoa Juridica
-        
+
         /// <summary>
         /// Verifica se valor informado é número de PIS
         /// </summary>
@@ -74,7 +77,7 @@ namespace Devxcode
 
                 if (!CNPJ.IsNumeric())
                     throw new ArgumentException($"Parâmetro {nameof(CNPJ)} não é númerico");
-                
+
                 if (CNPJ.Length != 14)
                     throw new ArgumentException($"Parâmetro {nameof(CNPJ)} não possue a quantidade de digitos de um CNPJ.");
 
@@ -84,7 +87,7 @@ namespace Devxcode
                 var multiplicador1 = new int[12] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
                 var multiplicador2 = new int[13] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 
-                var tempCnpj = CNPJ.Substring(0, 12);
+                var tempCnpj = CNPJ[..12];
 
                 var soma = 0;
 
@@ -154,7 +157,7 @@ namespace Devxcode
                 var multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
                 var multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 
-                var tempCpf = CPF.Substring(0, 9);
+                var tempCpf = CPF[..9];
 
                 var soma = 0;
 
@@ -202,7 +205,26 @@ namespace Devxcode
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static bool IsNumeric(this string value) => value.Where(x => char.IsNumber(x)).Count() > 0;
+        public static bool IsNumeric(this string value)
+        {
+            var resultado = Task.Factory.StartNew(() =>
+            {
+                foreach (var c in value)
+                {
+                    if (char.IsNumber(c) == false)
+                        return false;
+                }
+
+                return true;
+            });
+
+            resultado.Wait();
+            return resultado.Result;
+        }
+
+
+
+
 
         /// <summary>
         /// Remove todas as acentuação da string informada via parâmetrização
@@ -214,7 +236,7 @@ namespace Devxcode
             var conteudo = texto.Normalize(NormalizationForm.FormD);
             var builder = new StringBuilder();
 
-            for (var i = 0; i < conteudo.Length; i++)
+            for (int i = 0; i < conteudo.Length; i++)
             {
                 var uc = CharUnicodeInfo.GetUnicodeCategory(conteudo[i]);
                 if (uc != UnicodeCategory.NonSpacingMark)
@@ -233,15 +255,13 @@ namespace Devxcode
         {
             try
             {
-                if(!value.IsNumeric())
+                if (!value.IsNumeric())
                     throw new Exception($"Parâmetro {nameof(value)} não é númerico!");
 
-                for (var i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++)
                 {
-                    var ValueRepeat = "";
-                    foreach (var enumerable in Enumerable.Repeat(i, length))
-                        ValueRepeat += enumerable.ToString();
-                    
+                    var ValueRepeat = string.Join("", Enumerable.Repeat(i, length));
+
                     if (value == ValueRepeat)
                         throw new Exception($"Todos os caracteres informados no parâmetro {nameof(value)} são iguais a escala. Escala: 0 à 9 !");
                 }
@@ -252,6 +272,21 @@ namespace Devxcode
             {
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Complementa string com a quantidade de caracteres informadas
+        /// </summary>
+        /// <param name="value">Valor a ser preenchido </param>
+        /// <param name="character">caracter a ser usado no preenchimento</param>
+        /// <param name="length">tamanho total da string</param>
+        /// <param name="direction">direção dos dados de inclusão</param>
+        /// <returns></returns>
+        public static string CompleteWithCaracters(this string value, char character = '0', int length = 3, Enumeration.DirectionEnum direction = Enumeration.DirectionEnum.Left)
+        {
+            var ValueRepeat = string.Join("", Enumerable.Repeat(character, length - value.Length));
+            int index = direction == Enumeration.DirectionEnum.Left ? 0 : value.Length;
+            return value.Insert(index, ValueRepeat);
         }
     }
 
